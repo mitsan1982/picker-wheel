@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WheelProps {
   options: string[];
@@ -6,33 +6,47 @@ interface WheelProps {
   onSpinEnd?: () => void;
 }
 
-export function Wheel({ options, spinning, onSpinEnd }: WheelProps) {
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+export function Wheel({ options: initialOptions, spinning, onSpinEnd }: WheelProps) {
   const wheelRef = useRef<SVGSVGElement>(null);
   const rotationRef = useRef(0);
+  const [options, setOptions] = useState(initialOptions);
+
+  const segments = options.length;
+  const anglePerSegment = 360 / segments;
+  const radius = 180;
+  const centerX = 240;
+  const centerY = 240;
+  const textRadius = radius * 0.7;
 
   useEffect(() => {
     if (spinning && wheelRef.current) {
       const wheel = wheelRef.current;
-      const randomDegrees = 1800 + Math.random() * 1800; // 5-10 full rotations
+      const randomDegrees = 1800 + Math.random() * 1800;
       rotationRef.current += randomDegrees;
       
       wheel.style.transition = 'transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
       wheel.style.transform = `rotate(${rotationRef.current}deg)`;
 
       const timer = setTimeout(() => {
+        // Segment selection logic (no blinking)
+        // (You can keep the index calculation here for future use)
+        // const effectiveAngle = ((rotationRef.current - 90) % 360 + 360) % 360;
+        // const index = (segments - Math.floor(effectiveAngle / anglePerSegment)) % segments;
         if (onSpinEnd) onSpinEnd();
       }, 5000);
 
       return () => clearTimeout(timer);
     }
-  }, [spinning, onSpinEnd]);
-
-  const segments = options.length;
-  const anglePerSegment = 360 / segments;
-  const radius = 180; // 20% larger than 150
-  const centerX = 240; // 20% larger than 200
-  const centerY = 240; // 20% larger than 200
-  const textRadius = radius * 0.7; // Position text at 70% of the wheel radius
+  }, [spinning, onSpinEnd, anglePerSegment, segments, options]);
 
   const generatePath = (index: number) => {
     const startAngle = (index * anglePerSegment - 90) * (Math.PI / 180);
@@ -53,13 +67,22 @@ export function Wheel({ options, spinning, onSpinEnd }: WheelProps) {
     return { x, y, angle: (angle * 180) / Math.PI + 90 };
   };
 
+  const handleShuffle = () => {
+    setOptions(shuffleArray(options));
+    if (wheelRef.current) {
+      wheelRef.current.style.transition = 'none';
+      wheelRef.current.style.transform = 'rotate(0deg)';
+      rotationRef.current = 0;
+    }
+  };
+
   return (
     <div className="wheel-container" style={{ position: 'relative', width: 400, height: 400, overflow: 'visible' }}>
       {/* Static pointer above the wheel, now pointing downward */}
       <div
         style={{
           position: 'absolute',
-          top: '-20px', // move up to match larger wheel
+          top: '-20px',
           left: '50%',
           transform: 'translate(-50%, 0)',
           zIndex: 2,
@@ -78,6 +101,40 @@ export function Wheel({ options, spinning, onSpinEnd }: WheelProps) {
           />
         </svg>
       </div>
+      {/* Shuffle button in the center */}
+      <button
+        className="shuffle-btn"
+        onClick={handleShuffle}
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 3,
+          width: 38,
+          height: 38,
+          borderRadius: '50%',
+          background: '#fff',
+          border: '2px solid #0984E3',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 2px 8px rgba(9,132,227,0.10)',
+          cursor: 'pointer',
+          padding: 0,
+        }}
+        title="Shuffle options"
+        aria-label="Shuffle options"
+        disabled={spinning}
+      >
+        {/* Shuffle SVG icon */}
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 3H19V6" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M3 19L19 3" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M19 16V19H16" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M3 3L7.5 7.5" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
       <svg
         ref={wheelRef}
         width="480"
