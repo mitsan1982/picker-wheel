@@ -6,10 +6,14 @@
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  letter-spacing: 0.01em;
+  margin: 0;
+  padding: 0 0.2rem;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
@@ -134,15 +138,18 @@ button:hover {
 }
 
 :root {
-  --primary-color: #2D3436;
-  --accent-color: #0984E3;
-  --background: #FFFFFF;
-  --text-color: #2D3436;
-  --text-light: #636E72;
-  --card-bg: #FFFFFF;
-  --border-color: #DFE6E9;
-  --gradient-start: #0984E3;
-  --gradient-end: #6C5CE7;
+  --primary-color: #35682d;
+  --accent-color: #7bb661;
+  --background: #f9f7f1;
+  --text-color: #35682d;
+  --text-light: #7bb661;
+  --card-bg: #fff;
+  --border-color: #a3d977;
+  --gradient-start: #a3d977;
+  --gradient-end: #7bb661;
+  --button-bg: #7bb661;
+  --button-hover: #5e8c3a;
+  --button-text: #fff;
 }
 
 * {
@@ -160,13 +167,12 @@ body {
   line-height: 1.6;
   color: var(--text-color);
   overflow-x: hidden;
+  background: var(--background);
 }
 
 .app {
   min-height: 100vh;
   background: var(--background);
-  margin: 0;
-  padding: 0;
 }
 
 /* Navbar */
@@ -176,37 +182,50 @@ body {
   left: 0;
   right: 0;
   width: 100vw;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
+  background: var(--background);
   border-bottom: 1px solid var(--border-color);
+  z-index: 1000;
+  height: 38px;
+  box-shadow: none;
+  color: var(--primary-color);
 }
 
 .nav-content {
   max-width: 100%;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 38px;
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary-color);
+  letter-spacing: 0.01em;
+  margin: 0;
+  padding: 0 0.2rem;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .nav-links a {
-  color: var(--text-color);
+  color: var(--primary-color);
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
+  font-weight: 400;
+  font-size: 0.95rem;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  transition: color 0.2s;
 }
 
 .nav-links a:hover {
@@ -215,21 +234,20 @@ body {
 
 /* Hero Section */
 .hero-bg {
-  min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #5b86e5 0%, #36d1c4 100%);
+  background: #fff;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding-top: 80px;
+  padding-top: 60px;
   padding-bottom: 40px;
   margin: 0;
 }
 
-.hero-card {
-  background: rgba(255,255,255,0.10);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+.hero-card-bg {
+  background: linear-gradient(135deg, #a3d977 0%, #7bb661 100%);
   border-radius: 32px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
   max-width: 1100px;
   width: 100%;
   margin: 0 auto;
@@ -284,8 +302,8 @@ body {
 }
 
 .cta-button {
-  background: linear-gradient(90deg, #0984E3 0%, #6C5CE7 100%);
-  color: #fff;
+  background: var(--button-bg);
+  color: var(--button-text);
   border: none;
   padding: 1.1rem 2.5rem;
   font-size: 1.25rem;
@@ -296,7 +314,7 @@ body {
   transition: background 0.2s, transform 0.2s;
 }
 .cta-button:hover {
-  background: linear-gradient(90deg, #6C5CE7 0%, #0984E3 100%);
+  background: var(--button-hover);
   transform: translateY(-2px) scale(1.04);
 }
 
@@ -322,8 +340,8 @@ body {
 
 .spin-button {
   margin-top: 1.5rem;
-  background: linear-gradient(90deg, #0984E3 0%, #6C5CE7 100%);
-  color: #fff;
+  background: var(--button-bg);
+  color: var(--button-text);
   border: none;
   padding: 0.9rem 2.2rem;
   font-size: 1.1rem;
@@ -334,7 +352,7 @@ body {
   transition: background 0.2s, transform 0.2s;
 }
 .spin-button:hover:not(:disabled) {
-  background: linear-gradient(90deg, #6C5CE7 0%, #0984E3 100%);
+  background: var(--button-hover);
   transform: translateY(-2px) scale(1.04);
 }
 .spin-button:disabled {
@@ -452,6 +470,7 @@ body {
 .feature-icon {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
+  color: #5e8c3a;
 }
 
 .feature-card h3 {
@@ -494,8 +513,8 @@ body {
 }
 
 .create-button {
-  background: white;
-  color: var(--accent-color);
+  background: var(--button-bg);
+  color: var(--button-text);
   border: none;
   padding: 1rem 3rem;
   font-size: 1.25rem;
@@ -625,7 +644,7 @@ body {
 /* Footer */
 .footer {
   background: var(--primary-color);
-  color: white;
+  color: #fff;
   padding: 4rem 2rem;
 }
 
@@ -641,6 +660,7 @@ body {
 .footer-logo {
   font-size: 1.5rem;
   font-weight: 700;
+  color: #fff;
 }
 
 .footer-links {

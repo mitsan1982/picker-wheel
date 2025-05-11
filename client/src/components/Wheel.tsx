@@ -127,12 +127,10 @@ export function Wheel({ options: initialOptions, spinning, onSpinEnd }: WheelPro
         aria-label="Shuffle options"
         disabled={spinning}
       >
-        {/* Shuffle SVG icon */}
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 3H19V6" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M3 19L19 3" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M19 16V19H16" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M3 3L7.5 7.5" stroke="#0984E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        {/* Material Icons refresh icon: smooth arc with arrowhead */}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 8 8" stroke="#0984E3" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          <polyline points="21 4 21 9 16 9" stroke="#0984E3" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
       <svg
@@ -143,35 +141,39 @@ export function Wheel({ options: initialOptions, spinning, onSpinEnd }: WheelPro
         className="wheel"
         style={{ display: 'block', position: 'absolute', top: '-40px', left: '-40px' }}
       >
-        {options.map((option, index) => {
-          const { x, y, angle } = getTextPosition(index);
-          return (
-            <g key={index}>
-              <path
-                d={generatePath(index)}
-                fill={`hsl(${(index * 360) / segments}, 70%, 60%)`}
-                stroke="white"
-                strokeWidth="2"
-              />
-              <text
-                x={x}
-                y={y}
-                transform={`rotate(${angle}, ${x}, ${y})`}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="white"
-                fontSize="16"
-                fontWeight="bold"
-                style={{
-                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                  userSelect: 'none',
-                }}
-              >
-                {option}
-              </text>
-            </g>
-          );
-        })}
+        {(() => {
+          const palette = ['#7bb661', '#a3d977', '#4e7d32', '#b6e388', '#5e8c3a', '#8fc866'];
+          return options.map((option, index) => {
+            const { x, y, angle } = getTextPosition(index);
+            const color = palette[index % palette.length];
+            return (
+              <g key={index}>
+                <path
+                  d={generatePath(index)}
+                  fill={color}
+                  stroke="white"
+                  strokeWidth="2"
+                />
+                <text
+                  x={x}
+                  y={y}
+                  transform={`rotate(${angle}, ${x}, ${y})`}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="white"
+                  fontSize="16"
+                  fontWeight="bold"
+                  style={{
+                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                    userSelect: 'none',
+                  }}
+                >
+                  {option}
+                </text>
+              </g>
+            );
+          });
+        })()}
         <circle cx={centerX} cy={centerY} r="12" fill="white" />
       </svg>
     </div>

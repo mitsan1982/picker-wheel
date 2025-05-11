@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import logo from './assets/pickle-logo.png';
 import { Wheel } from './components/Wheel'
 import './App.css'
 
@@ -19,7 +20,10 @@ function App() {
     <div className="app">
       <nav className="navbar">
         <div className="nav-content">
-          <div className="logo">Wheel of Fortune</div>
+          <div className="logo" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <img src={logo} alt="Pickle Wheel logo" style={{height: '28px', width: '28px', objectFit: 'contain', marginRight: '0.3rem'}} />
+            Pickle Wheel
+          </div>
           <div className="nav-links">
             <a href="#features">Features</a>
             <a href="#create">Create</a>
@@ -29,20 +33,21 @@ function App() {
       </nav>
 
       <section className="hero-bg">
-        <div className="hero-card">
+        <div className="hero-card-bg">
           <div className="hero-flex">
             <div className="hero-text">
-              <h1>Where <span className="gradient-text">Randomness</span> Meets</h1>
-              <h2>Creativity in Decision Making</h2>
+              <h1>Spin the Pickle!</h1>
+              <h2>Fun, Fair, and Fast Decision Making</h2>
               <p className="subtitle">
-                Transform your choices into an exciting experience with our interactive wheel picker.<br/>
-                Perfect for teams, events, and everyday decisions.
+                Make your choices fun and easy with Pickle Wheel! <br/>
+                Perfect for games, giveaways, team decisions, and more.<br/>
+                Visit us at <a href="https://picklewheel.com" target="_blank" rel="noopener noreferrer" style={{color: '#fff', textDecoration: 'underline'}}>picklewheel.com</a>
               </p>
               <button 
                 className="cta-button"
                 onClick={() => setShowCreateForm(true)}
               >
-                Create Your First Wheel
+                Create Your First Pickle Wheel
               </button>
             </div>
             <div className="hero-wheel">
@@ -167,14 +172,14 @@ function App() {
 
       <footer className="footer" id="contact">
         <div className="footer-content">
-          <div className="footer-logo">Wheel of Fortune</div>
+          <div className="footer-logo">Pickle Wheel</div>
           <div className="footer-links">
             <a href="#features">Features</a>
             <a href="#create">Create</a>
             <a href="#contact">Contact</a>
           </div>
           <div className="footer-copyright">
-            © 2024 Wheel of Fortune. All rights reserved.
+            © 2024 Pickle Wheel (<a href="https://picklewheel.com" style={{color: '#fff', textDecoration: 'underline'}}>picklewheel.com</a>). All rights reserved.
           </div>
         </div>
       </footer>
