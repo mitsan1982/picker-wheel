@@ -10,6 +10,7 @@ process.on('unhandledRejection', (reason) => {
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { getDb } from './db';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -20,81 +21,110 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-// Mocked data
-interface Wheel {
-  id: string;
-  userId?: string;
-  name: string;
-  options: string[];
-  createdAt?: string;
-  spins?: number;
-  isPublic?: boolean;
-}
-
-let wheels: Wheel[] = [
-  {
-    id: '1',
-    name: 'Sample Wheel',
-    options: ['Option 1', 'Option 2', 'Option 3']
-  }
-];
-
 app.get('/', (req, res) => {
   res.send('Picker Wheel API is running!');
 });
 
 // Get all wheels
-app.get('/api/wheels', (req, res) => {
-  // Map each wheel to the expected frontend shape
-  const mappedWheels = wheels.map((w, idx) => ({
-    id: w.id,
-    userId: w.userId || 'mock-user',
-    name: w.name,
-    options: w.options,
-    createdAt: w.createdAt || new Date(Date.now() - idx * 86400000).toISOString(),
-    spins: w.spins ?? 0,
-    isPublic: w.isPublic ?? false
-  }));
-  res.json(mappedWheels);
+app.get('/api/wheels', async (req, res) => {
+  const db = await getDb();
+  const wheels: any[] = await db.all('SELECT * FROM wheels');
+  wheels.forEach(w => {
+    w.options = JSON.parse(w.options);
+    w.isPublic = !!w.isPublic;
+    if (!w.lastUsed) w.lastUsed = w.createdAt;
+  });
+  res.json(wheels);
 });
 
 // Create a new wheel
-app.post('/api/wheels', (req, res) => {
-  const { name, options } = req.body;
-  if (!name || !Array.isArray(options) || options.length === 0) {
-    return res.status(400).json({ error: 'Name and options are required.' });
+app.post('/api/wheels', async (req, res) => {
+  const { userId, name, options, isPublic = false } = req.body;
+  if (!userId || !name || !Array.isArray(options) || options.length === 0) {
+    return res.status(400).json({ error: 'userId, name, and options are required.' });
   }
-  const newWheel = {
-    id: (Date.now() + Math.random()).toString(),
-    name,
-    options
-  };
-  wheels.push(newWheel);
-  res.status(201).json(newWheel);
+  const db = await getDb();
+  // Check for duplicate name for this user
+  const exists = await db.get('SELECT 1 FROM wheels WHERE userId = ? AND name = ?', userId, name);
+  if (exists) {
+    return res.status(409).json({ error: 'Wheel name must be unique for this user.' });
+  }
+  const createdAt = new Date().toISOString();
+  const spins = 0;
+  const lastUsed = createdAt;
+  const result = await db.run(
+    'INSERT INTO wheels (userId, name, options, createdAt, spins, isPublic, lastUsed) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    userId, name, JSON.stringify(options), createdAt, spins, isPublic ? 1 : 0, lastUsed
+  );
+  const wheel = await db.get('SELECT * FROM wheels WHERE id = ?', result.lastID);
+  wheel.options = JSON.parse(wheel.options);
+  wheel.isPublic = !!wheel.isPublic;
+  if (!wheel.lastUsed) wheel.lastUsed = wheel.createdAt;
+  res.status(201).json(wheel);
 });
 
 // Get a single wheel by ID
-app.get('/api/wheels/:id', (req, res) => {
-  const wheel = wheels.find(w => w.id === req.params.id);
+app.get('/api/wheels/:id', async (req, res) => {
+  const db = await getDb();
+  const wheel = await db.get('SELECT * FROM wheels WHERE id = ?', req.params.id);
   if (!wheel) return res.status(404).json({ error: 'Wheel not found.' });
+  wheel.options = JSON.parse(wheel.options);
+  wheel.isPublic = !!wheel.isPublic;
+  if (!wheel.lastUsed) wheel.lastUsed = wheel.createdAt;
   res.json(wheel);
 });
 
-// Spin a wheel (return a random option)
-app.post('/api/wheels/:id/spin', (req, res) => {
-  const wheel = wheels.find(w => w.id === req.params.id);
+// Update a wheel by ID
+app.put('/api/wheels/:id', async (req, res) => {
+  const db = await getDb();
+  const { name, options, isPublic } = req.body;
+  const wheel = await db.get('SELECT * FROM wheels WHERE id = ?', req.params.id);
   if (!wheel) return res.status(404).json({ error: 'Wheel not found.' });
-  const randomIndex = Math.floor(Math.random() * wheel.options.length);
-  const result = wheel.options[randomIndex];
-  res.json({ result });
+  // Check for duplicate name for this user (excluding this wheel)
+  if (name) {
+    const duplicate = await db.get('SELECT 1 FROM wheels WHERE userId = ? AND name = ? AND id != ?', wheel.userId, name, req.params.id);
+    if (duplicate) {
+      return res.status(409).json({ error: 'Wheel name must be unique for this user.' });
+    }
+  }
+  await db.run(
+    'UPDATE wheels SET name = ?, options = ?, isPublic = ? WHERE id = ?',
+    name ?? wheel.name,
+    options ? JSON.stringify(options) : wheel.options,
+    typeof isPublic === 'boolean' ? (isPublic ? 1 : 0) : wheel.isPublic,
+    req.params.id
+  );
+  const updated = await db.get('SELECT * FROM wheels WHERE id = ?', req.params.id);
+  updated.options = JSON.parse(updated.options);
+  updated.isPublic = !!updated.isPublic;
+  res.json(updated);
 });
 
-// Delete a wheel
-app.delete('/api/wheels/:id', (req, res) => {
-  const index = wheels.findIndex(w => w.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Wheel not found.' });
-  wheels.splice(index, 1);
-  res.status(204).send();
+// Delete a wheel by ID
+app.delete('/api/wheels/:id', async (req, res) => {
+  const db = await getDb();
+  const wheel = await db.get('SELECT * FROM wheels WHERE id = ?', req.params.id);
+  if (!wheel) return res.status(404).json({ error: 'Wheel not found.' });
+  await db.run('DELETE FROM wheels WHERE id = ?', req.params.id);
+  res.json({ success: true });
+});
+
+// Spin a wheel (update lastUsed)
+app.post('/api/wheels/:id/spin', async (req, res) => {
+  const db = await getDb();
+  const wheel = await db.get('SELECT * FROM wheels WHERE id = ?', req.params.id);
+  if (!wheel) return res.status(404).json({ error: 'Wheel not found.' });
+  // Update lastUsed
+  const now = new Date().toISOString();
+  await db.run('UPDATE wheels SET lastUsed = ? WHERE id = ?', now, req.params.id);
+  // Optionally, increment spins
+  await db.run('UPDATE wheels SET spins = spins + 1 WHERE id = ?', req.params.id);
+  // Return the updated wheel
+  const updated = await db.get('SELECT * FROM wheels WHERE id = ?', req.params.id);
+  updated.options = JSON.parse(updated.options);
+  updated.isPublic = !!updated.isPublic;
+  if (!updated.lastUsed) updated.lastUsed = updated.createdAt;
+  res.json(updated);
 });
 
 app.listen(PORT, () => {

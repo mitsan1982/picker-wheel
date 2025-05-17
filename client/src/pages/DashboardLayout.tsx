@@ -226,12 +226,18 @@ export default function DashboardLayout() {
                   const userId = decoded?.sub;
                   if (!userId) throw new Error('User ID not found in JWT');
                   const optionsArr = wheelOptions.split(',').map(opt => opt.trim()).filter(Boolean);
-                  await createWheel({ userId, name: wheelName, options: optionsArr, isPublic });
+                  if (optionsArr.length < 2) {
+                    setError('Please enter at least 2 options.');
+                    setLoading(false);
+                    return;
+                  }
+                  const newWheel = await createWheel({ userId, name: wheelName, options: optionsArr, isPublic });
                   setShowCreateForm(false);
                   setWheelName('');
                   setWheelOptions('');
                   setIsPublic(false);
                   setRefreshWheels(r => r + 1);
+                  navigate(`/dashboard/wheel/${newWheel.id}`);
                 } catch (err: any) {
                   setError(err.message || 'Failed to create wheel');
                 } finally {

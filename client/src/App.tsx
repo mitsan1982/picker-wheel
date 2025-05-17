@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import logo from './assets/pickle-logo.png';
 import { Wheel } from './components/Wheel'
+import Login from './pages/Login'
 import './App.css'
 
 const sampleOptions = [
@@ -11,9 +13,16 @@ const sampleOptions = [
 function App() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const navigate = useNavigate();
 
   const handleSpinEnd = () => {
     setIsSpinning(false);
+  };
+
+  const handleLoginClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowLogin(true);
   };
 
   return (
@@ -28,6 +37,7 @@ function App() {
             <a href="#features">Features</a>
             <a href="#create">Create</a>
             <a href="#contact">Contact</a>
+            <a href="#" onClick={handleLoginClick}>Login</a>
           </div>
         </div>
       </nav>
@@ -153,7 +163,7 @@ function App() {
                   placeholder="Option 1, Option 2, Option 3"
                   required
                 />
-              </div>
+      </div>
               
               <div className="form-actions">
                 <button type="submit">Create Wheel</button>
@@ -163,7 +173,7 @@ function App() {
                   onClick={() => setShowCreateForm(false)}
                 >
                   Cancel
-                </button>
+        </button>
               </div>
             </form>
           </div>
@@ -177,13 +187,16 @@ function App() {
             <a href="#features">Features</a>
             <a href="#create">Create</a>
             <a href="#contact">Contact</a>
+            <a href="#" onClick={handleLoginClick}>Login</a>
           </div>
           <div className="footer-copyright">
             © 2024 Pickle Wheel (<a href="https://picklewheel.com" style={{color: '#fff', textDecoration: 'underline'}}>picklewheel.com</a>). All rights reserved.
           </div>
         </div>
       </footer>
-    </div>
+
+      {showLogin && <Login onClose={() => setShowLogin(false)} />}
+      </div>
   )
 }
 
