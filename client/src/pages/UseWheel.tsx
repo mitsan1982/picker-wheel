@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Wheel } from '../components/Wheel';
 import { getWheelById, type Wheel as WheelType, spinWheel } from '../api';
 

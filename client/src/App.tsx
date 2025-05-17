@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import logo from './assets/pickle-logo.png';
 import { Wheel } from './components/Wheel'
 import Login from './pages/Login'
@@ -14,7 +13,6 @@ function App() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const navigate = useNavigate();
 
   const handleSpinEnd = () => {
     setIsSpinning(false);
