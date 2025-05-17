@@ -16,7 +16,7 @@ export interface Wheel {
   lastUsed?: string;
 }
 
-const API_BASE_URL = 'https://pickle-wheel.onrender.com';
+const API_BASE_URL = 'https://internal.picklewheel.com';
 
 export async function createWheel({ userId, name, options, isPublic = false }: CreateWheelParams): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
