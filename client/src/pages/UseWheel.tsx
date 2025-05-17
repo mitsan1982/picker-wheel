@@ -3,16 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Wheel } from '../components/Wheel';
 import { getWheelById, type Wheel as WheelType, spinWheel } from '../api';
 
-interface DashboardContext {
-  userData: {
-    name: string;
-    email: string;
-    picture: string;
-  };
-  showCreateForm: boolean;
-  setShowCreateForm: (show: boolean) => void;
-}
-
 export default function UseWheel() {
   const { id } = useParams<{ id: string }>();
   const [wheel, setWheel] = useState<WheelType | null>(null);
