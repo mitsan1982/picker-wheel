@@ -16,10 +16,12 @@ export interface Wheel {
   lastUsed?: string;
 }
 
+const API_BASE_URL = 'https://pickle-wheel.onrender.com';
+
 export async function createWheel({ userId, name, options, isPublic = false }: CreateWheelParams): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');
-  const response = await fetch('http://localhost:5001/api/wheels', {
+  const response = await fetch(`${API_BASE_URL}/api/wheels`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -37,7 +39,7 @@ export async function createWheel({ userId, name, options, isPublic = false }: C
 export async function getWheels(): Promise<Wheel[]> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');
-  const response = await fetch('http://localhost:5001/api/wheels', {
+  const response = await fetch(`${API_BASE_URL}/api/wheels`, {
     headers: {
       'Authorization': `Bearer ${idToken}`,
     },
@@ -52,7 +54,7 @@ export async function getWheels(): Promise<Wheel[]> {
 export async function deleteWheel(wheelId: string): Promise<void> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');
-  const response = await fetch(`http://localhost:5001/api/wheels/${wheelId}`, {
+  const response = await fetch(`${API_BASE_URL}/api/wheels/${wheelId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${idToken}`,
@@ -67,7 +69,7 @@ export async function deleteWheel(wheelId: string): Promise<void> {
 export async function getWheelById(id: string): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');
-  const response = await fetch(`http://localhost:5001/api/wheels/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/wheels/${id}`, {
     headers: {
       'Authorization': `Bearer ${idToken}`,
     },
@@ -81,7 +83,7 @@ export async function getWheelById(id: string): Promise<Wheel> {
 export async function updateWheel(id: string, data: { name: string; options: string[]; isPublic: boolean }): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');
-  const response = await fetch(`http://localhost:5001/api/wheels/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/wheels/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -99,7 +101,7 @@ export async function updateWheel(id: string, data: { name: string; options: str
 export async function spinWheel(id: string): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');
-  const response = await fetch(`http://localhost:5001/api/wheels/${id}/spin`, {
+  const response = await fetch(`${API_BASE_URL}/api/wheels/${id}/spin`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${idToken}`,
