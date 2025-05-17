@@ -20,7 +20,6 @@ export default function UseWheel() {
   const [error, setError] = useState<string | null>(null);
   const [spinning, setSpinning] = useState(false);
   const navigate = useNavigate();
-  const { userData } = useOutletContext<DashboardContext>();
 
   useEffect(() => {
     if (!id) return;

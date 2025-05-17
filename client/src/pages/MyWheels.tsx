@@ -17,7 +17,7 @@ interface DashboardContext {
 
 export default function MyWheels() {
   const navigate = useNavigate();
-  const { userData, refreshWheels } = useOutletContext<DashboardContext>();
+  const { refreshWheels } = useOutletContext<DashboardContext>();
   const [wheels, setWheels] = useState<WheelType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
