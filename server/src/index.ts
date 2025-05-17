@@ -23,8 +23,12 @@ app.use(express.json());
 // Mocked data
 interface Wheel {
   id: string;
+  userId?: string;
   name: string;
   options: string[];
+  createdAt?: string;
+  spins?: number;
+  isPublic?: boolean;
 }
 
 let wheels: Wheel[] = [
@@ -41,7 +45,17 @@ app.get('/', (req, res) => {
 
 // Get all wheels
 app.get('/api/wheels', (req, res) => {
-  res.json(wheels);
+  // Map each wheel to the expected frontend shape
+  const mappedWheels = wheels.map((w, idx) => ({
+    id: w.id,
+    userId: w.userId || 'mock-user',
+    name: w.name,
+    options: w.options,
+    createdAt: w.createdAt || new Date(Date.now() - idx * 86400000).toISOString(),
+    spins: w.spins ?? 0,
+    isPublic: w.isPublic ?? false
+  }));
+  res.json(mappedWheels);
 });
 
 // Create a new wheel
