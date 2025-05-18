@@ -28,7 +28,7 @@ export default function UserDashboard() {
 
   return (
     <div style={{ width: '100%' }}>
-      <h2 style={{ marginBottom: '2rem', color: 'var(--primary-color)' }}>Account Metrics</h2>
+      <h2 style={{ marginBottom: '2rem', color: 'var(--primary-color)' }}>Dashboard</h2>
       {loading && <div>Loading...</div>}
       {error && <div style={{ color: 'red' }}>{error}</div>}
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
