@@ -11,6 +11,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { getDb } from './db';
+import { verifyFrontendSecret } from './middleware';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -24,6 +25,9 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Picker Wheel API is running!');
 });
+
+// Apply frontend secret verification to all API routes
+app.use('/api', verifyFrontendSecret);
 
 // Get all wheels
 app.get('/api/wheels', async (req, res) => {

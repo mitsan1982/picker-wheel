@@ -17,6 +17,7 @@ export interface Wheel {
 }
 
 const API_BASE_URL = 'https://internal.picklewheel.com';
+const FRONTEND_SECRET = 'pickle-wheel-frontend-secret-2024'; // This should match the backend's expected secret
 
 export async function createWheel({ userId, name, options, isPublic = false }: CreateWheelParams): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
@@ -26,6 +27,7 @@ export async function createWheel({ userId, name, options, isPublic = false }: C
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`,
+      'X-Frontend-Secret': FRONTEND_SECRET,
     },
     body: JSON.stringify({ userId, name, options, isPublic }),
   });
@@ -42,6 +44,7 @@ export async function getWheels(): Promise<Wheel[]> {
   const response = await fetch(`${API_BASE_URL}/api/wheels`, {
     headers: {
       'Authorization': `Bearer ${idToken}`,
+      'X-Frontend-Secret': FRONTEND_SECRET,
     },
   });
   if (!response.ok) {
@@ -58,6 +61,7 @@ export async function deleteWheel(wheelId: string): Promise<void> {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${idToken}`,
+      'X-Frontend-Secret': FRONTEND_SECRET,
     },
   });
   if (!response.ok) {
@@ -72,6 +76,7 @@ export async function getWheelById(id: string): Promise<Wheel> {
   const response = await fetch(`${API_BASE_URL}/api/wheels/${id}`, {
     headers: {
       'Authorization': `Bearer ${idToken}`,
+      'X-Frontend-Secret': FRONTEND_SECRET,
     },
   });
   if (!response.ok) {
@@ -88,6 +93,7 @@ export async function updateWheel(id: string, data: { name: string; options: str
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`,
+      'X-Frontend-Secret': FRONTEND_SECRET,
     },
     body: JSON.stringify(data),
   });
@@ -105,6 +111,7 @@ export async function spinWheel(id: string): Promise<Wheel> {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${idToken}`,
+      'X-Frontend-Secret': FRONTEND_SECRET,
     },
   });
   if (!response.ok) {
