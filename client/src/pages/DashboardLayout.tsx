@@ -67,13 +67,7 @@ export default function DashboardLayout() {
             <span>Pickle Wheel</span>
           </div>
           <div className="nav-links">
-            <button
-              style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 600 }}
-              onClick={() => navigate('/dashboard/my-wheels')}
-              disabled={location.pathname === '/dashboard/my-wheels'}
-            >
-              My Wheels
-            </button>
+            {/* Removed My Wheels button from header nav */}
           </div>
         </div>
       </nav>
@@ -175,28 +169,48 @@ export default function DashboardLayout() {
                 </div>
                 {/* Actions Card */}
                 <div className="actions-card" style={{marginTop: '2rem', background: 'white', borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', padding: '2rem', textAlign: 'center'}}>
-                  <button
-                    className="cta-button"
-                    style={{width: '100%', marginBottom: '1rem'}}
-                    onClick={() => navigate('/dashboard')}
-                    disabled={location.pathname === '/dashboard'}
-                  >
-                    Dashboard
-                  </button>
+                  <nav aria-label="User actions" style={{marginBottom: '1.5rem'}}>
+                    <ul style={{listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                      <li>
+                        <a
+                          href="#"
+                          onClick={e => { e.preventDefault(); navigate('/dashboard'); }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '0.9rem 1.2rem', borderRadius: 12,
+                            background: location.pathname === '/dashboard' ? 'var(--accent-color)' : 'transparent',
+                            color: location.pathname === '/dashboard' ? 'white' : 'var(--primary-color)',
+                            fontWeight: 600, fontSize: '1.08rem', textDecoration: 'none', cursor: location.pathname === '/dashboard' ? 'default' : 'pointer',
+                            transition: 'background 0.2s, color 0.2s',
+                          }}
+                          aria-current={location.pathname === '/dashboard' ? 'page' : undefined}
+                        >
+                          <span role="img" aria-label="Dashboard">🏠</span> Dashboard
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="#"
+                          onClick={e => { e.preventDefault(); navigate('/dashboard/my-wheels'); }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '0.9rem 1.2rem', borderRadius: 12,
+                            background: location.pathname === '/dashboard/my-wheels' ? 'var(--accent-color)' : 'transparent',
+                            color: location.pathname === '/dashboard/my-wheels' ? 'white' : 'var(--primary-color)',
+                            fontWeight: 600, fontSize: '1.08rem', textDecoration: 'none', cursor: location.pathname === '/dashboard/my-wheels' ? 'default' : 'pointer',
+                            transition: 'background 0.2s, color 0.2s',
+                          }}
+                          aria-current={location.pathname === '/dashboard/my-wheels' ? 'page' : undefined}
+                        >
+                          <span role="img" aria-label="My Wheels">🎡</span> My Wheels
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
                   <button
                     className="create-button"
-                    style={{width: '100%', marginBottom: '1rem'}}
+                    style={{width: '100%', marginTop: 8, marginBottom: 0, fontWeight: 700, fontSize: '1.08rem', borderRadius: 12, padding: '0.9rem 1.2rem'}}
                     onClick={() => setShowCreateForm(true)}
                   >
-                    Create Wheel
-                  </button>
-                  <button
-                    className="cta-button"
-                    style={{width: '100%'}}
-                    onClick={() => navigate('/dashboard/my-wheels')}
-                    disabled={location.pathname === '/dashboard/my-wheels'}
-                  >
-                    My Wheels
+                    <span role="img" aria-label="Create">➕</span> Create Wheel
                   </button>
                 </div>
               </>

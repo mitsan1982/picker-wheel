@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import logo from './assets/pickle-logo.png';
 import { Wheel } from './components/Wheel'
 import Login from './pages/Login'
 import './App.css'
@@ -13,6 +12,7 @@ function App() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const isLoggedIn = Boolean(localStorage.getItem('googleCredential'));
 
   const handleSpinEnd = () => {
     setIsSpinning(false);
@@ -28,14 +28,17 @@ function App() {
       <nav className="navbar">
         <div className="nav-content">
           <div className="logo" style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-            <img src={logo} alt="Pickle Wheel logo" style={{height: '28px', width: '28px', objectFit: 'contain', marginRight: '0.3rem'}} />
+            <img src="/pickle-logo.png" alt="Pickle Wheel logo" style={{height: '28px', width: '28px', objectFit: 'contain', marginRight: '0.3rem'}} />
             Pickle Wheel
           </div>
           <div className="nav-links">
+            {isLoggedIn ? (
+              <a href="#" onClick={e => { e.preventDefault(); window.location.href = '/dashboard'; }}>Dashboard</a>
+            ) : (
+              <a href="#" onClick={handleLoginClick}>Login</a>
+            )}
             <a href="#features">Features</a>
-            <a href="#create">Create</a>
             <a href="#contact">Contact</a>
-            <a href="#" onClick={handleLoginClick}>Login</a>
           </div>
         </div>
       </nav>
@@ -49,11 +52,10 @@ function App() {
               <p className="subtitle">
                 Make your choices fun and easy with Pickle Wheel! <br/>
                 Perfect for games, giveaways, team decisions, and more.<br/>
-                Visit us at <a href="https://picklewheel.com" target="_blank" rel="noopener noreferrer" style={{color: '#fff', textDecoration: 'underline'}}>picklewheel.com</a>
               </p>
               <button 
                 className="cta-button"
-                onClick={() => setShowCreateForm(true)}
+                onClick={() => setShowLogin(true)}
               >
                 Create Your First Pickle Wheel
               </button>
@@ -124,7 +126,7 @@ function App() {
             <p>Join thousands of users who trust our wheel picker for their decisions</p>
             <button 
               className="create-button"
-              onClick={() => setShowCreateForm(true)}
+              onClick={() => setShowLogin(true)}
             >
               Create Your Wheel
             </button>
@@ -183,9 +185,12 @@ function App() {
           <div className="footer-logo">Pickle Wheel</div>
           <div className="footer-links">
             <a href="#features">Features</a>
-            <a href="#create">Create</a>
             <a href="#contact">Contact</a>
-            <a href="#" onClick={handleLoginClick}>Login</a>
+            {isLoggedIn ? (
+              <a href="#" onClick={e => { e.preventDefault(); window.location.href = '/dashboard'; }}>Dashboard</a>
+            ) : (
+              <a href="#" onClick={handleLoginClick}>Login</a>
+            )}
           </div>
           <div className="footer-copyright">
             © 2024 Pickle Wheel (<a href="https://picklewheel.com" style={{color: '#fff', textDecoration: 'underline'}}>picklewheel.com</a>). All rights reserved.
