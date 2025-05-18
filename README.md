@@ -1,5 +1,35 @@
 # Picker Wheel
 
+## Frontend Environment Variables
+
+The frontend uses environment variables for configuration. Create a `.env` file in the `client/` directory for local development, or set these variables in your deployment platform (e.g., Vercel).
+
+### VITE_API_BASE_URL
+- **Purpose:** Sets the base URL for backend API requests.
+- **Local development:** Defaults to `http://localhost:5001` if not set.
+- **Production:** Defaults to `https://internal.picklewheel.com` if not set.
+- **Override:** You can set `VITE_API_BASE_URL` to any backend URL you want to use.
+
+Example for local development:
+```
+VITE_API_BASE_URL=http://localhost:5001
+```
+Example for production:
+```
+VITE_API_BASE_URL=https://internal.picklewheel.com
+```
+
+### VITE_FRONTEND_SECRET
+- **Purpose:** Secret key required for secure API access. Must match the backend's expected value.
+- **Required:** Yes, for all environments.
+
+Example:
+```
+VITE_FRONTEND_SECRET=your-secret-here
+```
+
+---
+
 ## Sample API Endpoints (curl)
 
 ### 1. List all wheels

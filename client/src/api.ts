@@ -16,7 +16,11 @@ export interface Wheel {
   lastUsed?: string;
 }
 
-const API_BASE_URL = 'https://internal.picklewheel.com';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.MODE === 'production'
+    ? 'https://internal.picklewheel.com'
+    : 'http://localhost:5001');
 const FRONTEND_SECRET = import.meta.env.VITE_FRONTEND_SECRET;
 if (!FRONTEND_SECRET) {
   throw new Error('VITE_FRONTEND_SECRET environment variable is required');

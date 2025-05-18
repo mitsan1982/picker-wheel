@@ -67,13 +67,6 @@ export default function DashboardLayout() {
             <span>Pickle Wheel</span>
           </div>
           <div className="nav-links">
-            <button 
-              style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 600 }}
-              onClick={() => navigate('/dashboard')}
-              disabled={location.pathname === '/dashboard'}
-            >
-              Dashboard
-            </button>
             <button
               style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 600 }}
               onClick={() => navigate('/dashboard/my-wheels')}
@@ -183,6 +176,14 @@ export default function DashboardLayout() {
                 {/* Actions Card */}
                 <div className="actions-card" style={{marginTop: '2rem', background: 'white', borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', padding: '2rem', textAlign: 'center'}}>
                   <button
+                    className="cta-button"
+                    style={{width: '100%', marginBottom: '1rem'}}
+                    onClick={() => navigate('/dashboard')}
+                    disabled={location.pathname === '/dashboard'}
+                  >
+                    Dashboard
+                  </button>
+                  <button
                     className="create-button"
                     style={{width: '100%', marginBottom: '1rem'}}
                     onClick={() => setShowCreateForm(true)}
@@ -193,6 +194,7 @@ export default function DashboardLayout() {
                     className="cta-button"
                     style={{width: '100%'}}
                     onClick={() => navigate('/dashboard/my-wheels')}
+                    disabled={location.pathname === '/dashboard/my-wheels'}
                   >
                     My Wheels
                   </button>
