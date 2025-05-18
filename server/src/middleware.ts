@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
-const FRONTEND_SECRET = 'pickle-wheel-frontend-secret-2024'; // This should match the frontend's secret
+const FRONTEND_SECRET = process.env.FRONTEND_SECRET;
+if (!FRONTEND_SECRET) {
+  throw new Error('FRONTEND_SECRET environment variable is required');
+}
 
 export function verifyFrontendSecret(req: Request, res: Response, next: NextFunction) {
   const frontendSecret = req.headers['x-frontend-secret'];

@@ -17,7 +17,10 @@ export interface Wheel {
 }
 
 const API_BASE_URL = 'https://internal.picklewheel.com';
-const FRONTEND_SECRET = 'pickle-wheel-frontend-secret-2024'; // This should match the backend's expected secret
+const FRONTEND_SECRET = import.meta.env.VITE_FRONTEND_SECRET;
+if (!FRONTEND_SECRET) {
+  throw new Error('VITE_FRONTEND_SECRET environment variable is required');
+}
 
 export async function createWheel({ userId, name, options, isPublic = false }: CreateWheelParams): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
