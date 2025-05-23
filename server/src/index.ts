@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 5001;
 
 const allowedOrigins = [
   'https://www.picklewheel.com',
+  'https://picklewheel.com',
   'http://localhost:5173'
 ];
 
