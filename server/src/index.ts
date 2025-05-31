@@ -11,8 +11,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { getDb } from './db';
-import { verifyFrontendSecret } from './middleware';
+import { verifyFrontendSecret, adminOnly } from './middleware';
 import { oauth2Client } from './auth';
+import os from 'os';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -20,11 +21,21 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-const allowedOrigins = [
-  'https://www.picklewheel.com',
-  'https://picklewheel.com',
-  'http://localhost:5173'
-];
+const isProduction = process.env.NODE_ENV === 'production';
+
+const allowedOrigins = isProduction
+  ? [
+      'https://www.picklewheel.com',
+      'https://picklewheel.com'
+    ]
+  : [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174',
+      'http://127.0.0.1:3000'
+    ];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -201,6 +212,44 @@ app.post('/api/wheels/:id/spin', async (req, res) => {
   } catch (error) {
     console.error('Token verification failed:', error);
     res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Admin metrics endpoint
+app.get('/api/admin/metrics', adminOnly, async (req, res) => {
+  try {
+    const db = await getDb();
+    // Users count (distinct userId in wheels table)
+    const users = await db.all('SELECT DISTINCT userId FROM wheels');
+    // Wheels count
+    const wheels = await db.all('SELECT id FROM wheels');
+    // Visits and registration attempts (stubbed for now)
+    // You can implement real tracking later
+    const visits = 0;
+    const registrationAttempts = 0;
+    // Instance metrics
+    const memoryUsage = process.memoryUsage();
+    const cpuUsage = process.cpuUsage();
+    const uptime = process.uptime();
+    const loadAvg = os.loadavg();
+    const freeMem = os.freemem();
+    const totalMem = os.totalmem();
+    res.json({
+      usersCount: users.length,
+      wheelsCount: wheels.length,
+      visits,
+      registrationAttempts,
+      instance: {
+        memoryUsage,
+        cpuUsage,
+        uptime,
+        loadAvg,
+        freeMem,
+        totalMem
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch metrics' });
   }
 });
 

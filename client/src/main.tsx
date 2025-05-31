@@ -8,6 +8,7 @@ import DashboardLayout from './pages/DashboardLayout'
 import UserDashboard from './pages/UserDashboard'
 import MyWheels from './pages/MyWheels'
 import UseWheel from './pages/UseWheel'
+import AdminDashboard from './pages/AdminDashboard'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route index element={<UserDashboard />} />
             <Route path="my-wheels" element={<MyWheels />} />
             <Route path="wheel/:id" element={<UseWheel />} />
+            <Route path="admin" element={<AdminDashboard />} />
           </Route>
           <Route path="/*" element={<App />} />
         </Routes>

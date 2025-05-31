@@ -203,6 +203,24 @@ export default function DashboardLayout() {
                           <span role="img" aria-label="My Wheels">🎡</span> My Wheels
                         </a>
                       </li>
+                      {userData.email === 'mitsan.flores@gmail.com' && (
+                        <li>
+                          <a
+                            href="#"
+                            onClick={e => { e.preventDefault(); navigate('/dashboard/admin'); }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 12, padding: '0.9rem 1.2rem', borderRadius: 12,
+                              background: location.pathname === '/dashboard/admin' ? 'var(--accent-color)' : 'transparent',
+                              color: location.pathname === '/dashboard/admin' ? 'white' : 'var(--primary-color)',
+                              fontWeight: 600, fontSize: '1.08rem', textDecoration: 'none', cursor: location.pathname === '/dashboard/admin' ? 'default' : 'pointer',
+                              transition: 'background 0.2s, color 0.2s',
+                            }}
+                            aria-current={location.pathname === '/dashboard/admin' ? 'page' : undefined}
+                          >
+                            <span role="img" aria-label="Admin">🛡️</span> Admin
+                          </a>
+                        </li>
+                      )}
                     </ul>
                   </nav>
                   <button
