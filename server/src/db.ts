@@ -28,6 +28,16 @@ export async function getDb(): Promise<Database> {
       name TEXT,
       createdAt TEXT
     );
+    CREATE TABLE IF NOT EXISTS visits (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp TEXT NOT NULL,
+      endpoint TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS registration_attempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId TEXT,
+      timestamp TEXT NOT NULL
+    );
   `);
 
   return db;

@@ -14,6 +14,7 @@ interface Metrics {
     totalMem: number;
   };
   users: any[];
+  endpointVisits?: { endpoint: string; count: number }[];
 }
 
 export default function AdminDashboard() {
@@ -159,6 +160,31 @@ export default function AdminDashboard() {
           </table>
         )}
       </div>
+
+      {/* Endpoint Visits Widget */}
+      {metrics.endpointVisits && metrics.endpointVisits.length > 0 && (
+        <>
+          <h3 style={{ marginTop: '2.5rem', color: 'var(--primary-color)' }}>Endpoint Visits</h3>
+          <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', padding: '2rem', marginTop: '1rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Endpoint</th>
+                  <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Visits</th>
+                </tr>
+              </thead>
+              <tbody>
+                {metrics.endpointVisits.map((row: any) => (
+                  <tr key={row.endpoint}>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{row.endpoint}</td>
+                    <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{row.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 } 

@@ -69,10 +69,17 @@ export async function upsertUserInfo(req: Request, res: Response, next: NextFunc
     const name = payload.name || null;
     const createdAt = new Date().toISOString();
     const db = await getDb();
-    await db.run(
+    const result = await db.run(
       `INSERT OR IGNORE INTO users (id, email, name, createdAt) VALUES (?, ?, ?, ?)`,
       userId, email, name, createdAt
     );
+    if ((result.changes ?? 0) > 0) {
+      // New user registered, log registration attempt
+      await db.run(
+        `INSERT INTO registration_attempts (userId, timestamp) VALUES (?, ?)`,
+        userId, createdAt
+      );
+    }
     await db.run(
       `UPDATE users SET email = ?, name = ? WHERE id = ?`,
       email, name, userId
@@ -81,4 +88,14 @@ export async function upsertUserInfo(req: Request, res: Response, next: NextFunc
   } catch (err) {
     next();
   }
+}
+
+export async function trackVisit(req: Request, res: Response, next: NextFunction) {
+  try {
+    const db = await getDb();
+    await db.run('INSERT INTO visits (timestamp, endpoint) VALUES (?, ?)', new Date().toISOString(), req.path);
+  } catch (err) {
+    // Ignore errors for visit tracking
+  }
+  next();
 } 

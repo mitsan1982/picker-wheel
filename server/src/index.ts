@@ -13,7 +13,7 @@ process.on('unhandledRejection', (reason) => {
 import express from 'express';
 import cors from 'cors';
 import { getDb } from './db';
-import { verifyFrontendSecret, adminOnly, upsertUserInfo } from './middleware';
+import { verifyFrontendSecret, adminOnly, upsertUserInfo, trackVisit } from './middleware';
 import { oauth2Client } from './auth';
 import os from 'os';
 
@@ -49,13 +49,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  const db = await getDb();
+  await db.run('INSERT INTO visits (timestamp) VALUES (?)', new Date().toISOString());
   res.send('Picker Wheel API is running!');
 });
 
 // Apply frontend secret verification to all API routes
 app.use('/api', verifyFrontendSecret);
 app.use('/api', upsertUserInfo);
+app.use('/api', trackVisit);
 
 // Helper function to verify Google token and get user ID
 async function verifyToken(req: express.Request): Promise<string> {
@@ -257,10 +260,13 @@ app.get('/api/admin/metrics', adminOnly, async (req, res) => {
     }
     // Wheels count
     const wheels = await db.all('SELECT id FROM wheels');
-    // Visits and registration attempts (stubbed for now)
-    // You can implement real tracking later
-    const visits = 0;
-    const registrationAttempts = 0;
+    // Visits and registration attempts
+    const visitsRow = await db.get("SELECT COUNT(*) as count FROM visits WHERE endpoint = '/' ");
+    const visits = visitsRow ? visitsRow.count : 0;
+    const regRow = await db.get('SELECT COUNT(*) as count FROM registration_attempts');
+    const registrationAttempts = regRow ? regRow.count : 0;
+    // Endpoint visits
+    const endpointVisits = await db.all('SELECT endpoint, COUNT(*) as count FROM visits GROUP BY endpoint');
     // Instance metrics
     const memoryUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
@@ -273,6 +279,7 @@ app.get('/api/admin/metrics', adminOnly, async (req, res) => {
       wheelsCount: wheels.length,
       visits,
       registrationAttempts,
+      endpointVisits,
       instance: {
         memoryUsage,
         cpuUsage,
@@ -286,6 +293,12 @@ app.get('/api/admin/metrics', adminOnly, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch metrics' });
   }
+});
+
+app.post('/api/visits', async (req, res) => {
+  const db = await getDb();
+  await db.run('INSERT INTO visits (timestamp, endpoint) VALUES (?, ?)', new Date().toISOString(), '/');
+  res.json({ success: true });
 });
 
 app.listen(PORT, () => {

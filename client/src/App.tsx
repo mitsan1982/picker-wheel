@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Wheel } from './components/Wheel'
 import Login from './pages/Login'
 import './App.css'
+import { Analytics } from '@vercel/analytics/react'
 
 const sampleOptions = [
   'Pizza', 'Burger', 'Sushi', 'Tacos',
@@ -199,7 +200,8 @@ function App() {
       </footer>
 
       {showLogin && <Login onClose={() => setShowLogin(false)} />}
-      </div>
+      <Analytics />
+    </div>
   )
 }
 
