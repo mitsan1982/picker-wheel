@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Wheel } from './components/Wheel'
 import Login from './pages/Login'
 import './App.css'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 const sampleOptions = [
   'Pizza', 'Burger', 'Sushi', 'Tacos',
@@ -201,6 +202,7 @@ function App() {
 
       {showLogin && <Login onClose={() => setShowLogin(false)} />}
       <Analytics />
+      <SpeedInsights />
     </div>
   )
 }
