@@ -138,6 +138,9 @@ export default function AdminDashboard() {
               <tr>
                 <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Email</th>
                 <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Name</th>
+                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Created</th>
+                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Wheels</th>
+                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Spins</th>
                 <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Role</th>
               </tr>
             </thead>
@@ -146,6 +149,9 @@ export default function AdminDashboard() {
                 <tr key={user.email}>
                   <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.email}</td>
                   <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.name || '-'}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.wheelCount ?? 0}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.totalSpins ?? 0}</td>
                   <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.role || 'user'}</td>
                 </tr>
               ))}
