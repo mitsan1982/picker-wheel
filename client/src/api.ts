@@ -26,6 +26,9 @@ if (!FRONTEND_SECRET) {
   throw new Error('VITE_FRONTEND_SECRET environment variable is required');
 }
 
+console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
+console.log('VITE_FRONTEND_SECRET:', import.meta.env.VITE_FRONTEND_SECRET);
+
 export async function createWheel({ userId, name, options, isPublic = false }: CreateWheelParams): Promise<Wheel> {
   const idToken = localStorage.getItem('googleCredential');
   if (!idToken) throw new Error('Not authenticated');

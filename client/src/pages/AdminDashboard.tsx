@@ -13,6 +13,7 @@ interface Metrics {
     freeMem: number;
     totalMem: number;
   };
+  users: any[];
 }
 
 export default function AdminDashboard() {
@@ -124,6 +125,33 @@ export default function AdminDashboard() {
         <div><b>Load Average:</b> {metrics.instance.loadAvg.map(n => n.toFixed(2)).join(', ')}</div>
         <div><b>Free Memory:</b> {(metrics.instance.freeMem / 1024 / 1024).toFixed(1)} MB</div>
         <div><b>Total Memory:</b> {(metrics.instance.totalMem / 1024 / 1024).toFixed(1)} MB</div>
+      </div>
+
+      {/* Users Widget */}
+      <h3 style={{ marginTop: '2.5rem', color: 'var(--primary-color)' }}>Users</h3>
+      <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', padding: '2rem', marginTop: '1rem' }}>
+        {!metrics.users ? (
+          <div>No users data available.</div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Email</th>
+                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Name</th>
+                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #ddd' }}>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {metrics.users.map((user: any) => (
+                <tr key={user.email}>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.email}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.name || '-'}</td>
+                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{user.role || 'user'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

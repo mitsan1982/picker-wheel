@@ -19,8 +19,15 @@ export async function getDb(): Promise<Database> {
       createdAt TEXT NOT NULL,
       spins INTEGER DEFAULT 0,
       isPublic INTEGER DEFAULT 0,
-      lastUsed TEXT
-    )
+      lastUsed TEXT,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT,
+      name TEXT,
+      createdAt TEXT
+    );
   `);
 
   return db;

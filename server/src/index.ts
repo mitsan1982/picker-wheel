@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 console.log("Starting Picker Wheel server...");
 
 process.on('uncaughtException', (err) => {
@@ -9,14 +12,10 @@ process.on('unhandledRejection', (reason) => {
 
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { getDb } from './db';
-import { verifyFrontendSecret, adminOnly } from './middleware';
+import { verifyFrontendSecret, adminOnly, upsertUserInfo } from './middleware';
 import { oauth2Client } from './auth';
 import os from 'os';
-
-// Load environment variables from .env file
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -56,6 +55,7 @@ app.get('/', (req, res) => {
 
 // Apply frontend secret verification to all API routes
 app.use('/api', verifyFrontendSecret);
+app.use('/api', upsertUserInfo);
 
 // Helper function to verify Google token and get user ID
 async function verifyToken(req: express.Request): Promise<string> {
@@ -97,18 +97,39 @@ app.get('/api/wheels', async (req, res) => {
 // Create a new wheel
 app.post('/api/wheels', async (req, res) => {
   try {
-    const userId = await verifyToken(req);
-    const { name, options, isPublic = false } = req.body;
+    // Get user info from token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    const token = authHeader.split(' ')[1];
+    const ticket = await oauth2Client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    if (!payload || !payload.sub) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    const userId = payload.sub;
+    const email = payload.email || null;
+    const name = payload.name || null;
+    const createdAt = new Date().toISOString();
+    const db = await getDb();
+    // Upsert user info
+    await db.run(
+      `INSERT OR IGNORE INTO users (id, email, name, createdAt) VALUES (?, ?, ?, ?)`,
+      userId, email, name, createdAt
+    );
+    const { options, isPublic = false } = req.body;
     if (!name || !Array.isArray(options) || options.length === 0) {
       return res.status(400).json({ error: 'name and options are required.' });
     }
-    const db = await getDb();
     // Check for duplicate name for this user
     const exists = await db.get('SELECT 1 FROM wheels WHERE userId = ? AND name = ?', userId, name);
     if (exists) {
       return res.status(409).json({ error: 'Wheel name must be unique for this user.' });
     }
-    const createdAt = new Date().toISOString();
     const spins = 0;
     const lastUsed = createdAt;
     const result = await db.run(
@@ -219,8 +240,17 @@ app.post('/api/wheels/:id/spin', async (req, res) => {
 app.get('/api/admin/metrics', adminOnly, async (req, res) => {
   try {
     const db = await getDb();
-    // Users count (distinct userId in wheels table)
-    const users = await db.all('SELECT DISTINCT userId FROM wheels');
+    // Users: join wheels and users table to get email and name
+    const usersRaw = await db.all('SELECT DISTINCT userId FROM wheels');
+    const users = [];
+    for (const u of usersRaw) {
+      const userInfo = await db.get('SELECT email, name FROM users WHERE id = ?', u.userId);
+      users.push({
+        email: userInfo && userInfo.email ? userInfo.email : u.userId,
+        name: userInfo && userInfo.name ? userInfo.name : null,
+        role: 'user'
+      });
+    }
     // Wheels count
     const wheels = await db.all('SELECT id FROM wheels');
     // Visits and registration attempts (stubbed for now)
@@ -246,7 +276,8 @@ app.get('/api/admin/metrics', adminOnly, async (req, res) => {
         loadAvg,
         freeMem,
         totalMem
-      }
+      },
+      users
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch metrics' });

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { oauth2Client } from './auth';
+import { getDb } from './db';
 
 const FRONTEND_SECRET = process.env.FRONTEND_SECRET;
 if (!FRONTEND_SECRET) {
@@ -49,5 +50,35 @@ export async function adminOnly(req: Request, res: Response, next: NextFunction)
   } catch (err) {
     console.error('Unexpected error in adminOnly:', err);
     return res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+export async function upsertUserInfo(req: Request, res: Response, next: NextFunction) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return next();
+    const token = authHeader.split(' ')[1];
+    const ticket = await oauth2Client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    if (!payload || !payload.sub) return next();
+    const userId = payload.sub;
+    const email = payload.email || null;
+    const name = payload.name || null;
+    const createdAt = new Date().toISOString();
+    const db = await getDb();
+    await db.run(
+      `INSERT OR IGNORE INTO users (id, email, name, createdAt) VALUES (?, ?, ?, ?)`,
+      userId, email, name, createdAt
+    );
+    await db.run(
+      `UPDATE users SET email = ?, name = ? WHERE id = ?`,
+      email, name, userId
+    );
+    next();
+  } catch (err) {
+    next();
   }
 } 
