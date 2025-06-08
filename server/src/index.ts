@@ -51,7 +51,7 @@ app.use(express.json());
 
 app.get('/', async (req, res) => {
   const db = await getDb();
-  await db.run('INSERT INTO visits (timestamp) VALUES (?)', new Date().toISOString());
+  await db.run('INSERT INTO visits (timestamp, endpoint) VALUES (?, ?)', new Date().toISOString(), '/');
   res.send('Picker Wheel API is running!');
 });
 
