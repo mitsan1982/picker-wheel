@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Wheel } from './components/Wheel'
 import Login from './pages/Login'
 import './App.css'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
+import { useNavigate } from 'react-router-dom'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const sampleOptions = [
   'Pizza', 'Burger', 'Sushi', 'Tacos',
@@ -14,7 +17,8 @@ function App() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const isLoggedIn = Boolean(localStorage.getItem('googleCredential'));
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem('googleCredential')));
+  const navigate = useNavigate();
 
   const handleSpinEnd = () => {
     setIsSpinning(false);
@@ -24,6 +28,31 @@ function App() {
     e.preventDefault();
     setShowLogin(true);
   };
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const response = await fetch(`${API_URL}/auth/check`, {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setIsLoggedIn(data.isLoggedIn);
+          if (!data.isLoggedIn) {
+            navigate('/');
+          }
+        } else {
+          setIsLoggedIn(false);
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Error checking login status:', error);
+        setIsLoggedIn(false);
+        navigate('/');
+      }
+    };
+    checkLogin();
+  }, [navigate]);
 
   return (
     <div className="app">
