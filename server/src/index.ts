@@ -243,16 +243,15 @@ app.post('/api/wheels/:id/spin', async (req, res) => {
 app.get('/api/admin/metrics', adminOnly, async (req, res) => {
   try {
     const db = await getDb();
-    // Users: join wheels and users table to get email and name
-    const usersRaw = await db.all('SELECT DISTINCT userId FROM wheels');
+    // Users: get all users from users table, not just those who have created wheels
+    const usersRaw = await db.all('SELECT id, email, name, createdAt FROM users');
     const users = [];
     for (const u of usersRaw) {
-      const userInfo = await db.get('SELECT email, name, createdAt FROM users WHERE id = ?', u.userId);
-      const wheelStats = await db.get('SELECT COUNT(*) as wheelCount, COALESCE(SUM(spins), 0) as totalSpins FROM wheels WHERE userId = ?', u.userId);
+      const wheelStats = await db.get('SELECT COUNT(*) as wheelCount, COALESCE(SUM(spins), 0) as totalSpins FROM wheels WHERE userId = ?', u.id);
       users.push({
-        email: userInfo && userInfo.email ? userInfo.email : u.userId,
-        name: userInfo && userInfo.name ? userInfo.name : null,
-        createdAt: userInfo && userInfo.createdAt ? userInfo.createdAt : null,
+        email: u.email || u.id,
+        name: u.name || null,
+        createdAt: u.createdAt || null,
         wheelCount: wheelStats ? wheelStats.wheelCount : 0,
         totalSpins: wheelStats ? wheelStats.totalSpins : 0,
         role: 'user'
